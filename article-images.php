@@ -43,7 +43,7 @@
  */
 
 if (!isset($fallback_image)) {
-    $url = plugin_dir_url(__FILE__);
+    $url = plugin_dir_path(__FILE__);
     $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
     $url .= 'fallback.jpg';
     $url = get_site_url() . $url;
