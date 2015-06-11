@@ -165,13 +165,32 @@ function get_post_image($post_id = null, $fallback_image = FALLBACK_IMAGE_URL) {
 }
 
 /**
- * Wrap Background Image in HTML Style
+ * Wrap Post Image as Background Style
  * -----------------------------------------------------------------------------
- * @param  int    $post_id
+ * @param   int         $post_id        ID of the post.
+ * @return  string      $image          The image, wrapped as background-image.
  */
 
-function post_image_background($post_id = null, $echo = false) {
+function post_image_css($post_id = null, $echo = false) {
     $image = 'style="background-image: url(' . get_post_image($post_id) . ');"';
+
+    if ($echo) {
+        printf($image);
+        return;
+    }
+
+    return $image;
+}
+
+/**
+ * Wrap Post Image as <img>
+ * -----------------------------------------------------------------------------
+ * @param   int         $post_id        ID of the post.
+ * @return  string      $image          The image, wrapped as <img>
+ */
+
+function post_image_html($post_id = null, $echo = false, $alt ='') {
+    $image = '<img src="' . get_post_image($post_id) . '" alt="' . $alt . '"/>';
 
     if ($echo) {
         printf($image);
