@@ -232,7 +232,7 @@ function get_post_image_dimensions($post_id = null, $fallback = FALLBACK_IMAGE_P
         // 1. Pull image from post thumbnail.
         $image = get_attached_file(get_post_thumbnail_id($post_id), 'large');
     } else if (has_post_image($post_id)) {
-        // 2. Pull image from content. Assuemd to be local path.
+        // 2. Pull image from content. Assuemd TO be local path.
         $candidate = content_first_image($post_id);
 
         if (filter_var($candidate, FILTER_VALIDATE_URL)) {
@@ -259,8 +259,7 @@ function get_post_image_dimensions($post_id = null, $fallback = FALLBACK_IMAGE_P
 
     if (empty($dimensions)) {
         // 3. If all else fails, just use the fallback image.
-        $dimensions[] = imagesx($image);
-        $dimensions[] = imagesy($image);
+        $dimensions = array_slice(getimagesize($image), 0, 2);
     }
 
     return $dimensions;
