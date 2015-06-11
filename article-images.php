@@ -201,7 +201,7 @@ function post_image_background($post_id = null, $echo = false) {
  * 
  * @param   int     $post_id        ID of the post.
  * @param   string  $fallback       Path to the fallback image.
- * @param   array   $dimensions     The dimensions of the image.
+ * @return  array   $dimensions     The dimensions of the image.
  */
 
 function get_post_image_dimensions($post_id = null, $fallback = FALLBACK_IMAGE_PATH) {
