@@ -26,7 +26,7 @@ The content image will be fetched via curl if it does not exist on the local fil
 This function grabs an image for the article without consideration as to what that image may be.
 
 ### post_image_css/post_image_html
-Get the post image and wrap it as either an <img> tag or as background-image in CSS.
+Get the post image and wrap it as either an \<img\> tag or as background-image in CSS.
 
 ## Support
 Your mileage will vary; while this library is suitable for my site, it's compatibility with yours is unknowable. Caveat emptor! Pull requests and forks are welcome. If you have a simple support question, email <mark@bhalash.com>. I'm happy to take on paid commissions for more advanced requests, or paid commissions for other work, period. :) 
