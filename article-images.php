@@ -42,17 +42,18 @@
  * Feel free to set your own fallback image URL and path, and aim them wherever.
  */
 
-if (!defined(FALLBACK_IMAGE_URL)) {
-    // Web-accessible URL. This is a little hacky.
-    $path = plugin_dir_path(__FILE__);
-    $path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
-    $path .= 'fallback.jpg';
-    define('FALLBACK_IMAGE_URL', get_site_url() . $path);
-}
+if (!isset($fallback_image)) {
+    $url = plugin_dir_url(__FILE__);
+    $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
+    $url .= 'fallback.jpg';
+    $url = get_site_url() . $url;
 
-if (!defined(FALLBACK_IMAGE_PATH)) {
-    // Path on the local filesystem relative to this script.
-    define('FALLBACK_IMAGE_PATH' , __DIR__ . '/fallback.jpg');
+    $fallback_image = array(
+        // Web-accessible URL. This is a little hacky.
+        'url' => $url,
+        // Path on the local filesystem relative to this script.
+        'path' => __DIR__ . '/fallback.jpg'
+    );
 }
 
 /** 
@@ -147,10 +148,14 @@ function has_post_image($post_id = null) {
  * @return string   $header_thumb     Thumbnail image, if it exists.
  */
 
-function get_post_image($post_id = null, $fallback_image = FALLBACK_IMAGE_URL) {
+function get_post_image($post_id = null, $fallback_image = null) {
     if (is_null($post_id)) {
         global $post;
         $post_id = $post->ID;
+    }
+
+    if (is_null($fallback_image)) {
+        global $fallback_image;
     }
 
     if (has_post_thumbnail($post_id)) {
@@ -158,7 +163,7 @@ function get_post_image($post_id = null, $fallback_image = FALLBACK_IMAGE_URL) {
     } else if (has_post_image($post_id)) {
         $post_image = content_first_image($post_id);
     } else {
-        $post_image = $fallback_image;
+        $post_image = $fallback_image['url'];
     }
 
     return $post_image;
@@ -219,13 +224,17 @@ function post_image_html($post_id = null, $echo = false, $alt ='') {
  * @return  array   $dimensions     The dimensions of the image.
  */
 
-function get_post_image_dimensions($post_id = null, $fallback = FALLBACK_IMAGE_PATH) {
+function get_post_image_dimensions($post_id = null, $fallback_image = null) {
     if (is_null($post_id)) {
         global $post;
         $post_id = $post->ID;
     } 
 
-    $image = $fallback;
+    if (is_null($fallback_image)) {
+        global $fallback_image;
+    }
+
+    $image = $fallback_image['path'];
     $dimensions = array();
 
     if (has_post_thumbnail($post_id)) {
