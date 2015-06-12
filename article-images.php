@@ -252,6 +252,7 @@ function get_post_image_dimensions($post_id = null, $fallback_image = null) {
             $candidate = url_to_path($candidate);
 
             if (file_exists($candidate)) {
+                // If the file is on the local filesystem, use it.
                 $image = $candidate;
             } else if (function_exists('curl_init')) {
                 /* 2b. If the file is not testably local, then it probably 
@@ -262,6 +263,7 @@ function get_post_image_dimensions($post_id = null, $fallback_image = null) {
                 $dimensions[] = imagesy($image);
             }
         } else {
+            // If the file was local to start, leave it be.
             $image = $candidate;
         }
     }
