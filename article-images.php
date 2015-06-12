@@ -206,74 +206,36 @@ function post_image_html($post_id = null, $echo = false, $alt ='') {
 }
 
 /**
- * Get Post Image Dimensions
+ * Post Attachment Filesystem Path
  * -----------------------------------------------------------------------------
- * This function uses the same logical priority as get_post_image, with 
- * modifications:
- * 
- * 1. Dimensions of specified post thumbnail in it's large size.
- * 2. Dimensions of first image in post's content.
- * 3. Dimensions of sitewide fallback image.
- * 
- * The modification is for #2, the content image. If the URL isn't explicitly 
- * local, then the URL is first tested as local and then fetched remotely if 
- * that fails.
- * 
- * @param   int     $post_id        ID of the post.
- * @param   string  $fallback       Path to the fallback image.
- * @return  array   $dimensions     The dimensions of the image.
+ * @param   int       $post_id        ID of the post.
+ * @return  string                    Filesystem path to the attachment.
  */
 
-function get_post_image_dimensions($post_id = null, $fallback_image = null) {
+function post_attachment_path($post_id = null) {
     if (is_null($post_id)) {
         global $post;
         $post_id = $post->ID;
     } 
 
-    if (is_null($fallback_image)) {
-        global $fallback_image;
-    }
+    return get_attached_file(get_post_thumbnail_id($post_id), 'large');
+}
 
-    $image = $fallback_image['path'];
-    $dimensions = array();
+/**
+ * Content First Image Filesystem Path
+ * -----------------------------------------------------------------------------
+ * @param   int       $post_id        ID of the post.
+ * @return  string                    Filesystem path to the attachment.
+ */
 
-    if (has_post_thumbnail($post_id)) {
-        // 1. Pull image from post thumbnail.
-        $image = get_attached_file(get_post_thumbnail_id($post_id), 'large');
-    } else if (has_post_image($post_id)) {
-        // 2. Pull image from content. Assuemd TO be local path.
-        $candidate = content_first_image($post_id);
 
-        if (filter_var($candidate, FILTER_VALIDATE_URL)) {
-            /* 2a. If the path instead validates to be a URL. If the file cannot
-             * be validated as either existing locally, or fetch and tested, 
-             * then the fallback image will be used instead. */
+function content_first_image_path($post_id = null) {
+    if (is_null($post_id)) {
+        global $post;
+        $post_id = $post->ID;
+    } 
 
-            $candidate = url_to_path($candidate);
-
-            if (file_exists($candidate)) {
-                // If the file is on the local filesystem, use it.
-                $image = $candidate;
-            } else if (function_exists('curl_init')) {
-                /* 2b. If the file is not testably local, then it probably 
-                 * resides on a different server. Fetch the image header if curl
-                 * is available. Otherwise use the fallback image. */
-                $image = imagecreatefromstring(get_image_header($candidate));
-                $dimensions[] = imagesx($image);
-                $dimensions[] = imagesy($image);
-            }
-        } else {
-            // If the file was local to start, leave it be.
-            $image = $candidate;
-        }
-    }
-
-    if (empty($dimensions)) {
-        // 3. If all else fails, just use the fallback image.
-        $dimensions = array_slice(getimagesize($image), 0, 2);
-    }
-
-    return $dimensions;
+    return url_to_path(content_first_image($post_id));
 }
 
 /**
@@ -322,6 +284,84 @@ function get_image_header($url) {
     curl_close($curl);
 
     return imagecreatefromstring($data);
+}
+
+/**
+ * Get Dimensions of Remote Image File
+ * -----------------------------------------------------------------------------
+ * @param   string      $url            URL of the remote file.
+ * @return  array       $dimensions     The dimensions of the remote file.
+ */
+
+function get_remote_image_dimensions($url = null) {
+filter_var($url, FILTER_VALIDATE_URL)
+
+    $dimensions = array();
+
+    $image = imagecreatefromstring(get_image_header($candidate));
+    $dimensions[] = imagesx($image);
+    $dimensions[] = imagesy($image);
+
+    return $dimensions;
+}
+
+/**
+ * Get Post Image Dimensions
+ * -----------------------------------------------------------------------------
+ * This function uses the same logical priority as get_post_image, with 
+ * modifications:
+ * 
+ * 1. Dimensions of specified post thumbnail in it's large size.
+ * 2. Dimensions of first image in post's content.
+ * 3. Dimensions of sitewide fallback image.
+ * 
+ * The modification is for #2, the content image. If the URL isn't explicitly 
+ * local, then the URL is first tested as local and then fetched remotely if 
+ * that fails.
+ * 
+ * @param   int     $post_id        ID of the post.
+ * @param   string  $fallback       Path to the fallback image.
+ * @return  array   $dimensions     The dimensions of the image.
+ */
+
+function get_post_image_dimensions($post_id = null, $fallback = null) {
+    if (is_null($post_id)) {
+        global $post;
+        $post_id = $post->ID;
+    } 
+
+    if (is_null($fallback_image)) {
+        global $fallback_image;
+        $fallback = $fallback_image['path'];
+    }
+
+    $image = $fallback;
+    $dimensions = array();
+
+    if (has_post_thumbnail($post_id)) {
+        // 1. Pull image from post thumbnail.
+        $image = post_attachment_path($post_id);
+    } else if (has_post_image($post_id)) {
+        // 2. Pull image from content. Test as local, then treat as remote.
+        $candidate_path = content_first_image_path($post_id);
+
+        if (file_exists($candidate_path)) {
+            $image = $candidate_path;
+        } else {
+            $candidate_url = content_first_image($post_id);
+
+            if (function_exists('curl_init') && filter_var($candidate_url, FILTER_VALIDATE_URL)) {
+                $dimensions = get_remote_image_dimensions($candidate_url);
+            }
+        }
+    }
+
+    if (empty($dimensions)) {
+        // 3. If all else has failed, $image will be the fallback image.
+        $dimensions = array_slice(getimagesize($image), 0, 2);
+    }
+
+    return $dimensions;
 }
 
 ?>
