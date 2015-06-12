@@ -294,8 +294,6 @@ function get_image_header($url) {
  */
 
 function get_remote_image_dimensions($url = null) {
-filter_var($url, FILTER_VALIDATE_URL)
-
     $dimensions = array();
 
     $image = imagecreatefromstring(get_image_header($candidate));
