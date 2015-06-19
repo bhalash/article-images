@@ -328,7 +328,7 @@ function get_post_image_dimensions($post_id = null, $fallback = null) {
         $post_id = $id;
     } 
 
-    if (is_null($fallback_image)) {
+    if (is_null($fallback)) {
         global $fallback_image;
         $fallback = $fallback_image['path'];
     }
