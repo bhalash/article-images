@@ -150,8 +150,8 @@ function has_post_image($post_id = null) {
 
 function get_post_image($post_id = null, $fallback_image = null) {
     if (is_null($post_id)) {
-        global $post;
-        $post_id = $post->ID;
+        global $id;
+        $post_id = $id;
     }
 
     if (is_null($fallback_image)) {
@@ -214,8 +214,8 @@ function post_image_html($post_id = null, $echo = false, $alt ='') {
 
 function post_attachment_path($post_id = null) {
     if (is_null($post_id)) {
-        global $post;
-        $post_id = $post->ID;
+        global $id;
+        $post_id = $id;
     } 
 
     return get_attached_file(get_post_thumbnail_id($post_id), 'large');
@@ -231,8 +231,8 @@ function post_attachment_path($post_id = null) {
 
 function content_first_image_path($post_id = null) {
     if (is_null($post_id)) {
-        global $post;
-        $post_id = $post->ID;
+        global $id;
+        $post_id = $id;
     } 
 
     return url_to_path(content_first_image($post_id));
@@ -324,8 +324,8 @@ function get_remote_image_dimensions($url = null) {
 
 function get_post_image_dimensions($post_id = null, $fallback = null) {
     if (is_null($post_id)) {
-        global $post;
-        $post_id = $post->ID;
+        global $id;
+        $post_id = $id;
     } 
 
     if (is_null($fallback_image)) {
