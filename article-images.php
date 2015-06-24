@@ -42,18 +42,18 @@
  * Feel free to set your own fallback image URL and path, and aim them wherever.
  */
 
-if (!isset($fallback_image)) {
+if (!get_option('article_i_image')) {
     $url = plugin_dir_path(__FILE__);
     $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
     $url .= 'fallback.jpg';
     $url = get_site_url() . $url;
 
-    $fallback_image = array(
+    update_option('article_i_image', array(
         // Web-accessible URL. This is a little hacky.
         'url' => $url,
         // Path on the local filesystem relative to this script.
         'path' => __DIR__ . '/fallback.jpg'
-    );
+    ));
 }
 
 /** 
@@ -65,19 +65,21 @@ if (!isset($fallback_image)) {
  * 
  * See: http://www.wpbeginner.com/wp-themes/how-to-get-the-post-thumbnail-url-in-wordpress/
  * 
- * @param   int     $post_id        The ID of the post.
+ * @param   int     $post        The ID of the post.
  * @param   int     $thumb_size     The requested size of the thumbnail.
  * @param   bool    $return_arr     Return either the entire thumbnail object or just the URL.
  * @return  string  $thumb_url[0]   URL of the thumbnail.
  * @return  array   $thumb_url      All information on the attachment.
  */
 
-function get_post_thumbnail_url($post_id = null, $thumb_size = 'large', $return_arr = false) {
-    if (is_null($post_id)) {
-        $post_id = get_the_ID();
+function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr = false) {
+    $post = get_post($post); 
+
+    if (!$post) {
+        return false;
     }
 
-    $thumb_id = get_post_thumbnail_id($post_id);
+    $thumb_id = get_post_thumbnail_id($post->ID);
     $thumb_url = wp_get_attachment_image_src($thumb_id, $thumb_size, true);
     return ($return_arr) ? $thumb_url : $thumb_url[0];
 }
@@ -93,23 +95,22 @@ function get_post_thumbnail_url($post_id = null, $thumb_size = 'large', $return_
  * 
  * See: http://css-tricks.com/snippets/wordpress/get-the-first-image-from-a-post
  *
- * @param   int     $post_id        ID of candidate post.
+ * @param   int     $post        ID of candidate post.
  * @return  string                  Full URL of the first image found.
  * @return  bool                    Return false if no image found.
  */
 
-function content_first_image($post_id = null) {
-    $content = '';
-    $matches = array();
+function content_first_image($post = null) {
+    $post = get_post($post);
 
-    if (is_null($post_id)) { 
-        global $post;
-        $content = $post->post_content;
-    } else {
-        $content = get_post($post_id)->post_content;
+    if (!$post) {
+        return false;
     }
 
-    preg_match('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $content, $matches);
+    $post = $post->post_content;
+    $matches = array();
+
+    preg_match('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post, $matches);
     return (!empty($matches[1])) ? $matches[1] : false;
 }
 
@@ -119,20 +120,19 @@ function content_first_image($post_id = null) {
  * Because I habitually do not use post thumbnails, I need to instead determine
  * whether the post's content has an image, and thereafter I grab the first one. 
  * 
- * @param   int     $post_id        ID of candidate post.
+ * @param   int     $post        ID of candidate post.
  * @return  bool                    Post content has image true/false.
  */
 
-function has_post_image($post_id = null) {
-    if (is_null($post_id)) { 
-        global $post;
-        $content = $post->post_content;
-        $post_id = $post->ID;
-    } else {
-        $content = get_post($post_id)->post_content;
+function has_post_image($post = null) {
+    $post = get_post($post);
+
+    if (!$post) {
+        return false;
     }
 
-    return (strpos($content, '<img src') !== false);
+    $post = $post->post_content;
+    return (strpos($post, '<img src') !== false);
 }
 
 /**
@@ -144,24 +144,25 @@ function has_post_image($post_id = null) {
  * 2. First image in post's content.
  * 3. Sitewide fallback image.
  * 
- * @param  int      $post_id
+ * @param  int      $post
  * @return string   $header_thumb     Thumbnail image, if it exists.
  */
 
-function get_post_image($post_id = null, $fallback_image = null) {
-    if (is_null($post_id)) {
-        global $id;
-        $post_id = $id;
+function get_post_image($post = null, $fallback_image = null) {
+    $post = get_post($post);
+
+    if (!$post) {
+        return false;
     }
 
-    if (is_null($fallback_image)) {
-        global $fallback_image;
+    if (!$fallback_image) {
+        $fallback_image = get_option('article_i_image');    
     }
 
-    if (has_post_thumbnail($post_id)) {
-        $post_image = get_post_thumbnail_url($post_id, 'large'); 
-    } else if (has_post_image($post_id)) {
-        $post_image = content_first_image($post_id);
+    if (has_post_thumbnail($post->ID)) {
+        $post->ID_image = get_post->ID_thumbnail_url($post->ID, 'large'); 
+    } else if (has_post_image($post->ID)) {
+        $post->ID_image = content_first_image($post->ID);
     } else {
         $post_image = $fallback_image['url'];
     }
@@ -172,16 +173,22 @@ function get_post_image($post_id = null, $fallback_image = null) {
 /**
  * Wrap Post Image as Background Style
  * -----------------------------------------------------------------------------
- * @param   int         $post_id        ID of the post.
+ * @param   int         $post        ID of the post.
  * @return  string      $image          The image, wrapped as background-image.
  */
 
-function post_image_css($post_id = null, $echo = false) {
-    $image = 'style="background-image: url(' . get_post_image($post_id) . ');"';
+function post_image_css($post = null, $echo = false) {
+    $post = get_post($post);
+
+    if (!$post) {
+        return false;
+    }
+
+    $image = 'style="background-image: url(' . get_post_image($post->ID) . ');"';
 
     if ($echo) {
         printf($image);
-        return;
+        return true;
     }
 
     return $image;
@@ -190,16 +197,22 @@ function post_image_css($post_id = null, $echo = false) {
 /**
  * Wrap Post Image as <img>
  * -----------------------------------------------------------------------------
- * @param   int         $post_id        ID of the post.
+ * @param   int         $post        ID of the post.
  * @return  string      $image          The image, wrapped as <img>
  */
 
-function post_image_html($post_id = null, $echo = false, $alt ='') {
-    $image = '<img src="' . get_post_image($post_id) . '" alt="' . $alt . '"/>';
+function post_image_html($post = null, $echo = false, $alt ='') {
+    $post = get_post($post);
+
+    if (!$post) {
+        return false;
+    }
+
+    $image = '<img src="' . get_post->ID_image($post->ID) . '" alt="' . $alt . '"/>';
 
     if ($echo) {
         printf($image);
-        return;
+        return true;
     }
 
     return $image;
@@ -208,34 +221,36 @@ function post_image_html($post_id = null, $echo = false, $alt ='') {
 /**
  * Post Attachment Filesystem Path
  * -----------------------------------------------------------------------------
- * @param   int       $post_id        ID of the post.
+ * @param   int       $post        ID of the post.
  * @return  string                    Filesystem path to the attachment.
  */
 
-function post_attachment_path($post_id = null) {
-    if (is_null($post_id)) {
-        global $id;
-        $post_id = $id;
-    } 
+function post_attachment_path($post = null) {
+    $post = get_post($post);
 
-    return get_attached_file(get_post_thumbnail_id($post_id), 'large');
+    if (!$post) {
+        return false;
+    }
+
+    return get_attached_file(get_post->ID_thumbnail_id($post->ID), 'large');
 }
 
 /**
  * Content First Image Filesystem Path
  * -----------------------------------------------------------------------------
- * @param   int       $post_id        ID of the post.
+ * @param   int       $post        ID of the post.
  * @return  string                    Filesystem path to the attachment.
  */
 
 
-function content_first_image_path($post_id = null) {
-    if (is_null($post_id)) {
-        global $id;
-        $post_id = $id;
-    } 
+function content_first_image_path($post = null) {
+    $post = get_post($post);
 
-    return url_to_path(content_first_image($post_id));
+    if (!$post) {
+        return false;
+    }
+
+    return url_to_path(content_first_image($post->ID));
 }
 
 /**
@@ -317,36 +332,36 @@ function get_remote_image_dimensions($url = null) {
  * local, then the URL is first tested as local and then fetched remotely if 
  * that fails.
  * 
- * @param   int     $post_id        ID of the post.
+ * @param   int     $post        ID of the post.
  * @param   string  $fallback       Path to the fallback image.
  * @return  array   $dimensions     The dimensions of the image.
  */
 
-function get_post_image_dimensions($post_id = null, $fallback = null) {
-    if (is_null($post_id)) {
-        global $id;
-        $post_id = $id;
-    } 
+function get_post_image_dimensions($post = null, $fallback = null) {
+    $post = get_post($post);
 
-    if (is_null($fallback)) {
-        global $fallback_image;
-        $fallback = $fallback_image['path'];
+    if (!$post) {
+        return false;
+    }
+
+    if (!$fallback) {
+        $fallback = get_option('article_i_image')['path'];
     }
 
     $image = $fallback;
     $dimensions = array();
 
-    if (has_post_thumbnail($post_id)) {
+    if (has_post_thumbnail($post)) {
         // 1. Pull image from post thumbnail.
-        $image = post_attachment_path($post_id);
-    } else if (has_post_image($post_id)) {
+        $image = post_attachment_path($post);
+    } else if (has_post_image($post)) {
         // 2. Pull image from content. Test as local, then treat as remote.
-        $candidate_path = content_first_image_path($post_id);
+        $candidate_path = content_first_image_path($post);
 
         if (file_exists($candidate_path)) {
             $image = $candidate_path;
         } else {
-            $candidate_url = content_first_image($post_id);
+            $candidate_url = content_first_image($post);
 
             if (function_exists('curl_init') && filter_var($candidate_url, FILTER_VALIDATE_URL)) {
                 $dimensions = get_remote_image_dimensions($candidate_url);
