@@ -208,7 +208,7 @@ function post_image_html($post = null, $echo = false, $alt ='') {
         return false;
     }
 
-    $image = '<img src="' . get_post->ID_image($post->ID) . '" alt="' . $alt . '"/>';
+    $image = '<img src="' . get_post_image($post->ID) . '" alt="' . $alt . '"/>';
 
     if ($echo) {
         printf($image);
@@ -232,7 +232,7 @@ function post_attachment_path($post = null) {
         return false;
     }
 
-    return get_attached_file(get_post->ID_thumbnail_id($post->ID), 'large');
+    return get_attached_file(get_post_thumbnail_id($post->ID), 'large');
 }
 
 /**
