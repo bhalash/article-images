@@ -160,7 +160,7 @@ function get_post_image($post = null, $fallback_image = null) {
     }
 
     if (has_post_thumbnail($post->ID)) {
-        $post_image = get_post(ID_thumbnail_url($post->ID, 'large'); 
+        $post_image = get_post_thumbnail_url($post->ID, 'large'); 
     } else if (has_post_image($post->ID)) {
         $post_image = content_first_image($post->ID);
     } else {
