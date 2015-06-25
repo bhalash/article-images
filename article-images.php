@@ -63,13 +63,12 @@ if (!get_option('article_i_image')) {
  * image inside an anchor-for a post thumbnail. This wrapper extracts and 
  * returns only the URL.
  * 
- * See: http://www.wpbeginner.com/wp-themes/how-to-get-the-post-thumbnail-url-in-wordpress/
- * 
  * @param   int     $post        The ID of the post.
  * @param   int     $thumb_size     The requested size of the thumbnail.
  * @param   bool    $return_arr     Return either the entire thumbnail object or just the URL.
  * @return  string  $thumb_url[0]   URL of the thumbnail.
  * @return  array   $thumb_url      All information on the attachment.
+ * @link http://www.wpbeginner.com/wp-themes/how-to-get-the-post-thumbnail-url-in-wordpress/
  */
 
 function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr = false) {
@@ -93,11 +92,10 @@ function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr
  * This functions extracts and returns the first found image in the post,
  * no matter what that image happens to be.
  * 
- * See: http://css-tricks.com/snippets/wordpress/get-the-first-image-from-a-post
- *
  * @param   int     $post        ID of candidate post.
  * @return  string                  Full URL of the first image found.
  * @return  bool                    Return false if no image found.
+ * @link http://css-tricks.com/snippets/wordpress/get-the-first-image-from-a-post
  */
 
 function content_first_image($post = null) {
@@ -281,10 +279,9 @@ function url_to_path($url) {
  * The metadata of a JPG image is stored at the beginning of the file. Only the 
  * header of the file is needed for the purposes of establishing the dimensions.
  * 
- * See: http://stackoverflow.com/a/4635991/1433400
- * 
  * @param   string      $url        URL of the remote file.
  * @return  binary      $data       The binary image.
+ * @link http://stackoverflow.com/a/4635991/1433400
  */
 
 function get_image_header($url) {
