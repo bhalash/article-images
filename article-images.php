@@ -85,7 +85,7 @@ function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr
 }
 
 /**
- * Retrive first image in content.
+ * Retrieve First Content Image
  * -----------------------------------------------------------------------------
  * I chose not to use the featured image feature in WordPress, because
  * I do not want to be ultimately tied to WordPress as a blogging CMS.
@@ -132,7 +132,8 @@ function has_post_image($post = null) {
     }
 
     $post = $post->post_content;
-    return (strpos($post, '<img src') !== false);
+    // '<img' and 'src="' probably won't be adjacent.
+    return (strpos($post, '<img') !== false) && strpos($post, 'src="') !== false);
 }
 
 /**
