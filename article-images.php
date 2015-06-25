@@ -133,7 +133,7 @@ function has_post_image($post = null) {
 
     $post = $post->post_content;
     // '<img' and 'src="' probably won't be adjacent.
-    return (strpos($post, '<img') !== false) && strpos($post, 'src="') !== false);
+    return (strpos($post, '<img') !== false && strpos($post, 'src="') !== false);
 }
 
 /**
