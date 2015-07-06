@@ -310,8 +310,11 @@ function get_remote_image_dimensions($url = null) {
     $dimensions = array();
 
     $image = imagecreatefromstring(get_image_header($candidate));
-    $dimensions[] = imagesx($image);
-    $dimensions[] = imagesy($image);
+    
+    if ($image) {
+        $dimensions[] = imagesx($image);
+        $dimensions[] = imagesy($image);
+    }
 
     return $dimensions;
 }
