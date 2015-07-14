@@ -135,7 +135,7 @@ function has_post_image($post = null) {
 }
 
 /**
- * Get Post Image for Background
+ * Get Post Image
  * -----------------------------------------------------------------------------
  * Returns an image in this order:
  * 
@@ -143,8 +143,8 @@ function has_post_image($post = null) {
  * 2. First image in post's content.
  * 3. Sitewide fallback image.
  * 
- * @param  int      $post
- * @return string   $header_thumb     Thumbnail image, if it exists.
+ * @param   int/object      $post
+ * @return  string                                  Thumbnail image, if it exists.
  */
 
 function get_post_image($post = null, $fallback_image = null) {
@@ -167,6 +167,18 @@ function get_post_image($post = null, $fallback_image = null) {
     }
 
     return $post_image;
+}
+
+/**
+ * Echo Post Image
+ * -----------------------------------------------------------------------------
+ * @param   int/object      $post
+ * @param   string          $fallback_image         URL or path to fallback image.
+ * @return  string                                  Thumbnail image, if it exists.
+ */
+
+function the_post_image($post = null, $fallback_image = null) {
+    echo get_post_image($post, $fallback_image);
 }
 
 /**
