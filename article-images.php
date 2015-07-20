@@ -40,20 +40,28 @@
  * Set Fallback Image Path and URL
  * -----------------------------------------------------------------------------
  * Feel free to set your own fallback image URL and path, and aim them wherever.
+ * @param   array
  */
 
-if (!get_option('article_i_image')) {
-    $url = plugin_dir_path(__FILE__);
-    $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
-    $url .= 'fallback.jpg';
-    $url = get_site_url() . $url;
+function set_fallback_image($fallback = null) {
+    if (is_null($fallback) || !is_array($fallback)) {
+        $url = plugin_dir_path(__FILE__);
+        $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
+        $url .= 'fallback.jpg';
+        $url = get_site_url() . $url;
 
-    update_option('article_i_image', array(
-        // Web-accessible URL. This is a little hacky.
-        'url' => $url,
-        // Path on the local filesystem relative to this script.
-        'path' => __DIR__ . '/fallback.jpg'
-    ));
+        $path = __DIR__ . '/fallback.jpg';
+
+        $fallback = array(
+            // Web-accessible URL. This is a little hacky.
+            'url' => $url,
+            // Path on the local filesystem relative to this script.
+            'path' => $path
+        );
+    }
+
+    update_option('article_i_image', $fallback);
+    return $fallback;
 }
 
 /** 
@@ -156,6 +164,10 @@ function get_post_image($post = null, $fallback_image = null) {
 
     if (!$fallback_image) {
         $fallback_image = get_option('article_i_image');    
+
+        if (!$fallback_image) {
+            $fallback_image = set_fallback_image();
+        }
     }
 
     if (has_post_thumbnail($post->ID)) {
@@ -197,12 +209,11 @@ function post_image_css($post = null, $echo = false) {
 
     $image = 'style="background-image: url(' . get_post_image($post->ID) . ');"';
 
-    if ($echo) {
-        printf($image);
-        return true;
+    if (!$echo) {
+        return $image;
     }
 
-    return $image;
+    printf($image);
 }
 
 /**
@@ -350,18 +361,22 @@ function get_remote_image_dimensions($url = null) {
  * @return  array   $dimensions     The dimensions of the image.
  */
 
-function get_post_image_dimensions($post = null, $fallback = null) {
+function get_post_image_dimensions($post = null, $fallback_image = null) {
     $post = get_post($post);
 
     if (!$post) {
         return false;
     }
 
-    if (!$fallback) {
-        $fallback = get_option('article_i_image')['path'];
+    if (!$fallback_image) {
+        $fallback_image = get_option('article_i_image')['path'];
+
+        if (!$fallback_image) {
+            $fallback_image = set_fallback_image()['path'];
+        }
     }
 
-    $image = $fallback;
+    $image = $fallback_image;
     $dimensions = array();
 
     if (has_post_thumbnail($post)) {
