@@ -155,7 +155,7 @@ function has_post_image($post = null) {
  * @return  string                                  Thumbnail image, if it exists.
  */
 
-function get_post_image($post = null, $fallback_image = null) {
+function get_post_image($post = null, $size = 'large', $fallback_image = null) {
     $post = get_post($post);
 
     if (!$post) {
@@ -171,7 +171,7 @@ function get_post_image($post = null, $fallback_image = null) {
     }
 
     if (has_post_thumbnail($post->ID)) {
-        $post_image = get_post_thumbnail_url($post->ID, 'large'); 
+        $post_image = get_post_thumbnail_url($post->ID, $size); 
     } else if (has_post_image($post->ID)) {
         $post_image = content_first_image($post->ID);
     } else {
@@ -189,8 +189,8 @@ function get_post_image($post = null, $fallback_image = null) {
  * @return  string                                  Thumbnail image, if it exists.
  */
 
-function the_post_image($post = null, $fallback_image = null) {
-    echo get_post_image($post, $fallback_image);
+function the_post_image($post = null, $size = null, $fallback_image = null) {
+    printf(get_post_image($post, $size, $fallback_image));
 }
 
 /**
