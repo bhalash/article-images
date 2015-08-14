@@ -228,8 +228,6 @@ function post_image_html($post = null, $size = 'large', $echo = false, $alt = ''
         return false;
     }
 
-    $image = array();
-
     if (!$alt) {
         $alt = the_title_attribute(array(
             'post' => $post,
@@ -239,12 +237,11 @@ function post_image_html($post = null, $size = 'large', $echo = false, $alt = ''
 
     $src = get_post_image($post->ID, $size);
 
-    $imgae[] = '<img';
-    $image[] = 'class="post-image post-thumbnail"';
-    $image[] = 'src="' . $src . '"';
-    $image[] = 'alt="' . $alt . '"';
-
-    $image = implode(' ', $image);
+    $image = sprintf('<img class="%s" src="%s" alt="%s" />',
+        'post-image post-thumbnail',
+        $src, 
+        $alt
+    );
 
     if (!$echo) {
         return $image;
