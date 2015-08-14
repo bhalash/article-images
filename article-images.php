@@ -224,7 +224,7 @@ function post_image_css($post = null, $echo = false) {
  */
 
 function post_image_html($post = null, $size = 'large', $echo = false, $alt = '') {
-    if (!($post = get_post($post)) {
+    if (!($post = get_post($post))) {
         return false;
     }
 
