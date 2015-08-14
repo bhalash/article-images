@@ -223,21 +223,34 @@ function post_image_css($post = null, $echo = false) {
  * @return  string      $image          The image, wrapped as <img>
  */
 
-function post_image_html($post = null, $echo = false, $alt ='') {
-    $post = get_post($post);
-
-    if (!$post) {
+function post_image_html($post = null, $size = 'large', $echo = false, $alt = '') {
+    if (!($post = get_post($post)) {
         return false;
     }
 
-    $image = '<img src="' . get_post_image($post->ID) . '" alt="' . $alt . '"/>';
+    $image = array();
 
-    if ($echo) {
-        printf($image);
-        return true;
+    if (!$alt) {
+        $alt = the_title_attribute(array(
+            'post' => $post,
+            'echo' => false
+        ));
     }
 
-    return $image;
+    $src = get_post_image($post->ID, $size);
+
+    $imgae[] = '<img';
+    $image[] = 'class="post-image post-thumbnail"';
+    $image[] = 'src="' . $src . '"';
+    $image[] = 'alt="' . $alt . '"';
+
+    $image = implode(' ', $image);
+
+    if (!$echo) {
+        return $image;
+    }
+
+    printf($image);
 }
 
 /**
