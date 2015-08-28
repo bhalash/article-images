@@ -36,6 +36,8 @@
  * Article Images. If not, see <http://www.gnu.org/licenses/>.
  */
 
+define('A_IMAGES_PATH', plugin_dir_path(__FILE__));
+
 /**
  * Set Fallback Image Path and URL
  * -----------------------------------------------------------------------------
@@ -45,7 +47,7 @@
 
 function set_fallback_image($fallback = null) {
     if (is_null($fallback) || !is_array($fallback)) {
-        $url = plugin_dir_path(__FILE__);
+        $url = A_IMAGES_PATH;
         $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
         $url .= 'fallback.jpg';
         $url = get_site_url() . $url;
@@ -101,16 +103,18 @@ function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr
  * no matter what that image happens to be.
  * 
  * @param   int     $post        ID of candidate post.
- * @return  string                  Full URL of the first image found.
- * @return  bool                    Return false if no image found.
+ * @return  string  Full URL of the first image found.
+ * @return  bool    Return false if no image found.
  * @link http://css-tricks.com/snippets/wordpress/get-the-first-image-from-a-post
  */
 
 function content_first_image($post = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     $post = $post->post_content;
@@ -127,14 +131,16 @@ function content_first_image($post = null) {
  * whether the post's content has an image, and thereafter I grab the first one. 
  * 
  * @param   int     $post        ID of candidate post.
- * @return  bool                    Post content has image true/false.
+ * @return  bool    Post content has image true/false.
  */
 
 function has_post_image($post = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     $post = $post->post_content;
@@ -156,10 +162,12 @@ function has_post_image($post = null) {
  */
 
 function get_post_image($post = null, $size = 'large', $fallback_image = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     if (!$fallback_image) {
@@ -201,10 +209,12 @@ function the_post_image($post = null, $size = null, $fallback_image = null) {
  */
 
 function post_image_css($post = null, $echo = false) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     $image = 'style="background-image: url(' . get_post_image($post->ID) . ');"';
@@ -225,7 +235,11 @@ function post_image_css($post = null, $echo = false) {
 
 function post_image_html($post = null, $size = 'large', $echo = false, $alt = '') {
     if (!($post = get_post($post))) {
-        return false;
+        global $post;
+    }
+
+    if (!$post) {
+        return;
     }
 
     if (!$alt) {
@@ -258,10 +272,12 @@ function post_image_html($post = null, $size = 'large', $echo = false, $alt = ''
  */
 
 function post_attachment_path($post = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     return get_attached_file(get_post_thumbnail_id($post->ID), 'large');
@@ -276,10 +292,12 @@ function post_attachment_path($post = null) {
 
 
 function content_first_image_path($post = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     return url_to_path(content_first_image($post->ID));
@@ -372,10 +390,12 @@ function get_remote_image_dimensions($url = null) {
  */
 
 function get_post_image_dimensions($post = null, $fallback_image = null) {
-    $post = get_post($post);
+    if (!($post = get_post($post))) {
+        global $post;
+    }
 
     if (!$post) {
-        return false;
+        return;
     }
 
     if (!$fallback_image) {
