@@ -325,52 +325,6 @@ function url_to_path($url) {
 }
 
 /**
- * Get Remote Image Header
- * -----------------------------------------------------------------------------
- * The metadata of a JPG image is stored at the beginning of the file. Only the 
- * header of the file is needed for the purposes of establishing the dimensions.
- * 
- * @param   string      $url        URL of the remote file.
- * @return  binary      $data       The binary image.
- * @link http://stackoverflow.com/a/4635991/1433400
- */
-
-function get_image_header($url) {
-    $headers = array('Range: bytes=0-32768');
-
-    $curl = curl_init($url);
-
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-    $data = curl_exec($curl);
-    
-    curl_close($curl);
-
-    return imagecreatefromstring($data);
-}
-
-/**
- * Get Dimensions of Remote Image File
- * -----------------------------------------------------------------------------
- * @param   string      $url            URL of the remote file.
- * @return  array       $dimensions     The dimensions of the remote file.
- */
-
-function get_remote_image_dimensions($url = null) {
-    $dimensions = array();
-
-    $image = imagecreatefromstring(get_image_header($candidate));
-    
-    if ($image) {
-        $dimensions[] = imagesx($image);
-        $dimensions[] = imagesy($image);
-    }
-
-    return $dimensions;
-}
-
-/**
  * Get Post Image Dimensions
  * -----------------------------------------------------------------------------
  * This function uses the same logical priority as get_post_image, with 
@@ -418,12 +372,6 @@ function get_post_image_dimensions($post = null, $fallback_image = null) {
 
         if (file_exists($candidate_path)) {
             $image = $candidate_path;
-        } else {
-            $candidate_url = content_first_image($post);
-
-            if (function_exists('curl_init') && filter_var($candidate_url, FILTER_VALIDATE_URL)) {
-                $dimensions = get_remote_image_dimensions($candidate_url);
-            }
         }
     }
 
