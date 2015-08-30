@@ -20,23 +20,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html The GNU General Public License v3.0
  * @version    3.0
  * @link       https://github.com/bhalash/article-images
- *
- * This file is part of Article Images.
- *
- * Article Images is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software 
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * 
- * Article Images is distributed in the hope that it will be useful, but WITHOUT ANY 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
- * Article Images. If not, see <http://www.gnu.org/licenses/>.
  */
-
-define('A_IMAGES_PATH', plugin_dir_path(__FILE__));
 
 /**
  * Set Fallback Image Path and URL
@@ -47,7 +31,7 @@ define('A_IMAGES_PATH', plugin_dir_path(__FILE__));
 
 function set_fallback_image($fallback = null) {
     if (is_null($fallback) || !is_array($fallback)) {
-        $url = A_IMAGES_PATH;
+        $url = plugin_dir_path(__FILE__);
         $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
         $url .= 'fallback.jpg';
         $url = get_site_url() . $url;
