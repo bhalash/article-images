@@ -4,21 +4,21 @@
  * Article Image Functions
  * -----------------------------------------------------------------------------
  * This script contains a number of functions that expand the image functions in
- * WordPress. I do not use the WordPress media manage on my own blog. I am in 
+ * WordPress. I do not use the WordPress media manage on my own blog. I am in
  * blogging for the long term, and expect to move away from WordPres eventually.
- * 
+ *
  * Because of this, I use the first image found in content as the featured image
- * on my posts. 
- * 
+ * on my posts.
+ *
  * This library is self-contained and aimed at developers who might appreciate
  * a wider range of functinos for their own WordPress project. :)
- * 
+ *
  * @category   PHP Script
  * @package    WordPress Article Images
  * @author     Mark Grealish <mark@bhalash.com>
  * @copyright  Copyright (c) 2015 Mark Grealish
- * @license    https://www.gnu.org/copyleft/gpl.html The GNU General Public License v3.0
- * @version    3.0
+ * @license    https://www.gnu.org/copyleft/gpl.html The GNU GPL v3.0
+ * @version    1.0
  * @link       https://github.com/bhalash/article-images
  */
 
@@ -50,13 +50,13 @@ function set_fallback_image($fallback = null) {
     return $fallback;
 }
 
-/** 
+/**
  * Return Thumbnail Image URL
  * -----------------------------------------------------------------------------
- * WordPress, by default, only has a handy function to return a glob of HTML-an 
- * image inside an anchor-for a post thumbnail. This wrapper extracts and 
+ * WordPress, by default, only has a handy function to return a glob of HTML-an
+ * image inside an anchor-for a post thumbnail. This wrapper extracts and
  * returns only the URL.
- * 
+ *
  * @param   int     $post        The ID of the post.
  * @param   int     $thumb_size     The requested size of the thumbnail.
  * @param   bool    $return_arr     Return either the entire thumbnail object or just the URL.
@@ -66,7 +66,7 @@ function set_fallback_image($fallback = null) {
  */
 
 function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr = false) {
-    $post = get_post($post); 
+    $post = get_post($post);
 
     if (!$post) {
         return false;
@@ -82,10 +82,10 @@ function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr
  * -----------------------------------------------------------------------------
  * I chose not to use the featured image feature in WordPress, because
  * I do not want to be ultimately tied to WordPress as a blogging CMS.
- * 
+ *
  * This functions extracts and returns the first found image in the post,
  * no matter what that image happens to be.
- * 
+ *
  * @param   int     $post        ID of candidate post.
  * @return  string  Full URL of the first image found.
  * @return  bool    Return false if no image found.
@@ -112,8 +112,8 @@ function content_first_image($post = null) {
  * Determine if Post Content has Image
  * -----------------------------------------------------------------------------
  * Because I habitually do not use post thumbnails, I need to instead determine
- * whether the post's content has an image, and thereafter I grab the first one. 
- * 
+ * whether the post's content has an image, and thereafter I grab the first one.
+ *
  * @param   int     $post        ID of candidate post.
  * @return  bool    Post content has image true/false.
  */
@@ -136,11 +136,11 @@ function has_post_image($post = null) {
  * Get Post Image
  * -----------------------------------------------------------------------------
  * Returns an image in this order:
- * 
+ *
  * 1. Specified post thumbnail in it's large size.
  * 2. First image in post's content.
  * 3. Sitewide fallback image.
- * 
+ *
  * @param   int/object      $post
  * @return  string                                  Thumbnail image, if it exists.
  */
@@ -155,7 +155,7 @@ function get_post_image($post = null, $size = 'large', $fallback_image = null) {
     }
 
     if (!$fallback_image) {
-        $fallback_image = get_option('article_i_image');    
+        $fallback_image = get_option('article_i_image');
 
         if (!$fallback_image) {
             $fallback_image = set_fallback_image();
@@ -163,7 +163,7 @@ function get_post_image($post = null, $size = 'large', $fallback_image = null) {
     }
 
     if (has_post_thumbnail($post->ID)) {
-        $post_image = get_post_thumbnail_url($post->ID, $size); 
+        $post_image = get_post_thumbnail_url($post->ID, $size);
     } else if (has_post_image($post->ID)) {
         $post_image = content_first_image($post->ID);
     } else {
@@ -237,7 +237,7 @@ function post_image_html($post = null, $size = 'large', $echo = false, $alt = ''
 
     $image = sprintf('<img class="%s" src="%s" alt="%s" />',
         'post-image post-thumbnail',
-        $src, 
+        $src,
         $alt
     );
 
@@ -291,8 +291,8 @@ function content_first_image_path($post = null) {
  * Convert URL to Filesystem Path
  * -----------------------------------------------------------------------------
  * /This does not guarantee the file or folder exists/. You must independently
- * test for its existence! 
- * 
+ * test for its existence!
+ *
  * @param   string      $url        URL to be converted into a local path.
  * @return  string      $path       Path converted from the URL.
  */
@@ -311,17 +311,17 @@ function url_to_path($url) {
 /**
  * Get Post Image Dimensions
  * -----------------------------------------------------------------------------
- * This function uses the same logical priority as get_post_image, with 
+ * This function uses the same logical priority as get_post_image, with
  * modifications:
- * 
+ *
  * 1. Dimensions of specified post thumbnail in it's large size.
  * 2. Dimensions of first image in post's content.
  * 3. Dimensions of sitewide fallback image.
- * 
- * The modification is for #2, the content image. If the URL isn't explicitly 
- * local, then the URL is first tested as local and then fetched remotely if 
+ *
+ * The modification is for #2, the content image. If the URL isn't explicitly
+ * local, then the URL is first tested as local and then fetched remotely if
  * that fails.
- * 
+ *
  * @param   int     $post        ID of the post.
  * @param   string  $fallback       Path to the fallback image.
  * @return  array   $dimensions     The dimensions of the image.
