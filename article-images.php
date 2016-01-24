@@ -360,7 +360,7 @@ function get_local_image_dimensions($post = null) {
     }
 
     // Return first two array elements: width and height as ints;
-    return $image ? array_slice(getimagesize($image), 0, 2) : false;
+    return $image ? array_slice(getimagesize($image), 0, 2) : [];
 }
 
 ?>
