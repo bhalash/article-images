@@ -32,8 +32,9 @@
  * @param   array       $fallback           Fallback images.
  */
 
+
 function set_post_fallback_image($fallback = null) {
-    if ($fallback || !get_option('article_images_fallback')) {
+    if ($fallback || !get_option('article_images_fallback' || WP_DEBUG)) {
         $fallback = $fallback ?: [
             // Web-accessible URL from directory path.
             'url' => str_replace($_SERVER['DOCUMENT_ROOT'], get_site_url(), __DIR__) . '/ai_fallback.jpg',
