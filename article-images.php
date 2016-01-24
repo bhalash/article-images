@@ -25,29 +25,48 @@
 /**
  * Set Fallback Image Path and URL
  * -----------------------------------------------------------------------------
- * Feel free to set your own fallback image URL and path, and aim them wherever.
- * @param   array
+ * This runs during WordPress init, or whenever else you call it. If the option
+ * hasn't been set, or $fallback isn't null, it'll set up the image. Correct
+ * format is up to yourself.
+ *
+ * @param   array       $fallback           Fallback images.
  */
 
-function set_fallback_image($fallback = null) {
-    if (is_null($fallback) || !is_array($fallback)) {
-        $url = plugin_dir_path(__FILE__);
-        $url = str_replace($_SERVER['DOCUMENT_ROOT'], '', $url);
-        $url .= 'fallback.jpg';
-        $url = get_site_url() . $url;
+function set_post_fallback_image($fallback = null) {
+    if ($fallback || !get_option('article_images_fallback')) {
+        $fallback = $fallback ?: [
+            // Web-accessible URL from directory path.
+            'url' => str_replace($_SERVER['DOCUMENT_ROOT'], get_site_url(), __DIR__) . '/images/ai_fallback.jpg',
+            // Path on the local filesystem relative current directory.
+            'path' => __DIR__ . '/images/ai_fallback.jpg',
+        ];
 
-        $path = __DIR__ . '/fallback.jpg';
+        update_option('article_images_fallback', $fallback, true);
+    }
+}
 
-        $fallback = array(
-            // Web-accessible URL. This is a little hacky.
-            'url' => $url,
-            // Path on the local filesystem relative to this script.
-            'path' => $path
-        );
+add_action('init', 'set_post_fallback_image', 10, 1);
+
+/**
+ * Determine if Post Content has Image
+ * -----------------------------------------------------------------------------
+ * Because I habitually do not use post thumbnails, I need to instead determine
+ * whether the post's content has an image, and thereafter I grab the first one.
+ *
+ * @param   int     $post        ID of candidate post.
+ * @return  bool    Post content has image true/false.
+ */
+
+function has_post_image($post = null) {
+    if (!($post = get_post($post))) {
+        global $post;
     }
 
-    update_option('article_i_image', $fallback);
-    return $fallback;
+    if (!$post) {
+        return false;
+    }
+
+    return has_post_thumbnail($post) || preg_match($post->post_content, '/<img\s.*?src=".*?\/>$/m') !== false;
 }
 
 /**
@@ -57,12 +76,12 @@ function set_fallback_image($fallback = null) {
  * image inside an anchor-for a post thumbnail. This wrapper extracts and
  * returns only the URL.
  *
- * @param   int     $post        The ID of the post.
+ * @link http://www.wpbeginner.com/wp-themes/how-to-get-the-post-thumbnail-url-in-wordpress/
+ * @param   int     $post           The ID of the post.
  * @param   int     $thumb_size     The requested size of the thumbnail.
  * @param   bool    $return_arr     Return either the entire thumbnail object or just the URL.
  * @return  string  $thumb_url[0]   URL of the thumbnail.
  * @return  array   $thumb_url      All information on the attachment.
- * @link http://www.wpbeginner.com/wp-themes/how-to-get-the-post-thumbnail-url-in-wordpress/
  */
 
 function get_post_thumbnail_url($post = null, $thumb_size = 'large', $return_arr = false) {
@@ -109,30 +128,6 @@ function content_first_image($post = null) {
 }
 
 /**
- * Determine if Post Content has Image
- * -----------------------------------------------------------------------------
- * Because I habitually do not use post thumbnails, I need to instead determine
- * whether the post's content has an image, and thereafter I grab the first one.
- *
- * @param   int     $post        ID of candidate post.
- * @return  bool    Post content has image true/false.
- */
-
-function has_post_image($post = null) {
-    if (!($post = get_post($post))) {
-        global $post;
-    }
-
-    if (!$post) {
-        return;
-    }
-
-    $post = $post->post_content;
-    // '<img' and 'src="' probably won't be adjacent.
-    return (strpos($post, '<img') !== false && strpos($post, 'src="') !== false);
-}
-
-/**
  * Get Post Image
  * -----------------------------------------------------------------------------
  * Returns an image in this order:
@@ -155,7 +150,7 @@ function get_post_image($post = null, $size = 'large', $fallback_image = null) {
     }
 
     if (!$fallback_image) {
-        $fallback_image = get_option('article_i_image');
+        $fallback_image = get_option('article_images_fallback');
 
         if (!$fallback_image) {
             $fallback_image = set_fallback_image();
@@ -337,7 +332,7 @@ function get_post_image_dimensions($post = null, $fallback_image = null) {
     }
 
     if (!$fallback_image) {
-        $fallback_image = get_option('article_i_image')['path'];
+        $fallback_image = get_option('article_images_fallback')['path'];
 
         if (!$fallback_image) {
             $fallback_image = set_fallback_image()['path'];
