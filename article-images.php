@@ -22,6 +22,10 @@
  * @link       https://github.com/bhalash/article-images
  */
 
+if (!defined('ABSPATH')) {
+    die('-1');
+}
+
 /**
  * Set Fallback Image Path and URL
  * -----------------------------------------------------------------------------
