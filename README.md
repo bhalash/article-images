@@ -17,9 +17,17 @@ Several functions in article-images blindly grab an image from an article withou
 3. The script's designated fallback image.
 
 ## Fallback Image
-Several functions in article-images.php use a last-resort fallback image when the article has neither a featured image nor a content image. This file is [fallback.jpg](fallback.jpg), and its usage is set at the head of article-images.php
+Several functions in article-images use a last-resort fallback image when an article:
 
-You are absolutely welcome to add and set your own fallback image in your own theme!
+1. Has no Post Thumbnail.
+2. Has no content image.
+
+This file is [fallback.jpg](fallback.jpg), and can be overridden by the `set_fallback_image` method. Pass it an array in this format:
+
+    [
+        'url' => 'http://example.com/path/to/my/image.jpg',
+        'path' => '/path/to/my/image.jpg'
+    ]
 
 ## Support
 This library is suitable for my site, and its compatibility with yours is unknowable. Pull requests and forks are welcome. If you have a simple support question, email <mark@bhalash.com>.
