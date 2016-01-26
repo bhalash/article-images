@@ -41,9 +41,9 @@ function set_post_fallback_image($fallback = null) {
     if ($fallback || !get_option('article_images_fallback') || WP_DEBUG) {
         $fallback = $fallback ?: [
             // Web-accessible URL from directory path.
-            'url' => str_replace($_SERVER['DOCUMENT_ROOT'], get_site_url(), __DIR__) . '/ai_fallback.jpg',
+            'url' => str_replace($_SERVER['DOCUMENT_ROOT'], get_site_url(), __DIR__) . '/fallback.jpg',
             // Path on the local filesystem relative current directory.
-            'path' => __DIR__ . '/ai_fallback.jpg',
+            'path' => __DIR__ . '/fallback.jpg',
         ];
 
         update_option('article_images_fallback', $fallback, true);
